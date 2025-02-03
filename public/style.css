@@ -1,0 +1,525 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* General Body Styles */
+body {
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    background: #f0f4f8; /* Light mode background */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding: 5px;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    font-size: 14px; /* Smaller font size for faster rendering */
+}
+
+body.dark-mode {
+    background: #121212; /* Dark mode background */
+    color: #fff; /* White text for dark mode */
+}
+
+/* Container Styling */
+.container {
+    width: 100%;
+    max-width: 800px; /* Smaller container width */
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+}
+
+body.dark-mode .container {
+    background: #1e1e1e; /* Dark container background */
+}
+.mode-toggle {
+    position: fixed;
+    right: 20px;
+    top: 30px;
+}
+
+/* Heading Styling */
+h1 {
+    font-size: 24px; /* Smaller heading */
+    margin-bottom: 15px;
+    color: #2c3e50;
+    text-align: center;
+}
+
+body.dark-mode h1 {
+    color: #fff;
+}
+  
+.sticky-navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #111;
+    padding: 15px 0;
+    z-index: 1000;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.sticky-navbar ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sticky-navbar li {
+    margin: 0 25px;
+}
+
+.sticky-navbar a {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.sticky-navbar a:hover {
+    color: #fff;
+    background-color: #ff4081;
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Sticky Navbar for Mobile */
+@media (max-width: 768px) {
+    .sticky-navbar {
+        padding: 10px 0;
+    }
+
+    .sticky-navbar a {
+        font-size: 16px;
+        padding: 10px;
+    }
+}
+
+/* Adding a small animation when the navbar comes into view */
+.sticky-navbar {
+    opacity: 0;
+    transform: translateY(100%);
+    animation: slideUp 0.5s forwards;
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Optional: If you'd like to have a dark mode version */
+body.dark-mode .sticky-navbar {
+    background-color: #1f1f1f;
+}
+
+body.dark-mode .sticky-navbar a {
+    color: #f0f0f0;
+}
+
+body.dark-mode .sticky-navbar a:hover {
+    background-color: #e040fb;
+}
+
+
+/* Form Container Styling */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Smaller gap */
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+/* Textarea Styling */
+textarea {
+    width: 100%;
+    padding: 12px; /* Smaller padding */
+    font-size: 14px; /* Smaller text */
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    resize: none;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+body.dark-mode textarea {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #5c6bc0;
+}
+
+/* Button Styling */
+button {
+    padding: 10px 15px; /* Reduced padding */
+    background-color: #5c6bc0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px; /* Smaller font size */
+}
+
+button:hover {
+    background-color: #3949ab;
+    transform: scale(1.05);
+}
+
+button:active {
+    background-color: #303f9f;
+}
+
+/* Posts Feed Styling */
+.posts-feed {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.post-card {
+    background-color: #ffffff;
+    padding: 15px; /* Smaller padding */
+    border-radius: 12px;
+    margin-bottom: 15px; /* Reduced margin */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .post-card {
+    background-color: #333;
+    color: #fff;
+}
+
+.post-card p {
+    font-size: 16px; /* Smaller text */
+    margin-bottom: 8px;
+}
+
+.post-card .timestamp {
+    font-size: 12px;
+    color: #aaa;
+}
+
+body.dark-mode .post-card .timestamp {
+    color: #bbb;
+}
+
+/* Post Card Actions (buttons) */
+.post-card .actions {
+    display: flex;
+    justify-content: space-between; /* Spread the buttons */
+    gap: 8px; /* Reduced gap */
+    margin-top: 10px;
+    flex-wrap: wrap;
+    align-items: center; /* Align buttons in center if space is small */
+}
+
+.post-card button {
+    background-color: transparent;
+    border: none;
+    color: #5c6bc0;
+    cursor: pointer;
+    font-size: 14px; /* Reduced font size */
+    padding: 8px 10px;
+}
+
+body.dark-mode .post-card button {
+    color: #fff;
+}
+
+.post-card button:hover {
+    color: #3949ab;
+}
+
+/* Footer Styling */
+footer {
+    margin-top: 25px;
+    font-size: 12px; /* Smaller footer */
+    color: #888;
+    text-align: center;
+}
+
+body.dark-mode footer {
+    color: #bbb;
+}
+
+/* Floating Navigation (FAB Buttons) */
+.floating-nav {
+    position: fixed;
+    bottom: 89px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+}
+
+.fab-btn {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 24px; /* Smaller icon size */
+    cursor: pointer;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.fab-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
+
+/* Menu Options Styling */
+.nav-options {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.nav-options.visible {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nav-option {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer;
+    border-radius: 10px;
+    width: 100px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.nav-option:hover {
+    background-color: #0056b3;
+}
+
+/* Overlay Styling */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    display: none;
+}
+
+.overlay.visible {
+    display: flex;
+}
+
+/* Content Container */
+.content-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 550px;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Close Button Styling */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+/* Button Click Animation */
+.button-clicked {
+    transform: scale(1.1);
+}
+
+/* Notification Styling */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4caf50;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+.notification.show-notification {
+    opacity: 1;
+    top: 30px;
+}
+
+.error-notification {
+    background-color: #f44336;
+}
+
+/* Comment Section Styling */
+.comments-section {
+    margin-top: 10px;
+    padding: 10px;
+    border-top: 2px solid #ddd;
+}
+
+.comment {
+    margin: 6px 0;
+    padding: 6px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.comment:hover {
+    background-color: #f1f1f1;
+}
+
+/* Mobile Styling */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 22px; /* Smaller heading for mobile */
+    }
+
+    .post-card {
+        padding: 12px; /* Reduced padding */
+    }
+
+    .post-card .actions {
+        justify-content: space-between; /* Spread the actions horizontally */
+        gap: 6px; /* Smaller gap between buttons */
+        flex-wrap: nowrap; /* Prevent wrapping */
+    }
+
+    .post-card button {
+        font-size: 12px; /* Smaller font size */
+        padding: 6px 8px; /* Reduced padding */
+    }
+
+    .fab-btn {
+        padding: 10px; /* Smaller floating button */
+        font-size: 22px;
+    }
+
+    .nav-option {
+        font-size: 14px; /* Smaller nav options */
+    }
+}
+
+.delete-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.delete-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.delete-modal-content h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.delete-modal-content p {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.modal-confirm {
+    background-color: #ff4d4d;
+    color: white;
+}
+
