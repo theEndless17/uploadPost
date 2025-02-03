@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { connectToDatabase } from '../utils/db'; // Your connection utility
+import { connectToDatabase } from '../utils/db';  // Your connection utility
 
 // Define the schema for the post
 const postSchema = new mongoose.Schema({
@@ -18,37 +18,55 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model('Post', postSchema);
 
 // Set CORS headers
-const setCorsHeaders = (res) => {
-    // You can replace this with a specific origin URL if necessary
-    res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');  // Allow specific methods
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');  // Allow specific headers
+const setCorsHeaders = (response) => {
+    response.headers.set('Access-Control-Allow-Origin', '*');  // Allow all origins
+    response.headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');  // Allow specific methods
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');  // Allow specific headers
 };
 
-// Serverless API handler for getting posts
-export default async function handler(req, res) {
-    // Set CORS headers before processing the request
-    setCorsHeaders(res);
+// Serverless API handler for getting posts (Cloudflare Pages specific)
+export async function onRequest(context) {
+    const { request } = context;
+    const url = new URL(request.url);
 
-    // Handle pre-flight OPTIONS request
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end(); // Respond with a 200 OK for OPTIONS pre-flight
+    // Set CORS headers for every request
+    let response = new Response(null, {
+        headers: { 'Content-Type': 'application/json' },
+    });
+    setCorsHeaders(response);
+
+    // Handle pre-flight OPTIONS request (CORS pre-flight)
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 200, headers: response.headers });
     }
 
-    // Handle GET requests to fetch posts
-    if (req.method === 'GET') {
+    // Handle GET request to fetch posts
+    if (request.method === 'GET') {
         try {
-            await connectToDatabase(); // Connect to MongoDB
+            await connectToDatabase();  // Connect to MongoDB
 
             // Fetch posts from the database, sorted by the timestamp in descending order
             const posts = await Post.find().sort({ timestamp: -1 });
-            res.status(200).json(posts); // Send posts as a JSON response
+
+            // Return the posts as a JSON response
+            response = new Response(JSON.stringify(posts), {
+                status: 200,
+                headers: response.headers,
+            });
+            return response;
+
         } catch (error) {
             console.error("Error retrieving posts:", error);
-            res.status(500).json({ message: 'Error retrieving posts', error }); // Handle any errors
+            return new Response(
+                JSON.stringify({ message: 'Error retrieving posts', error }),
+                { status: 500, headers: response.headers }
+            );
         }
     } else {
-        // If the request is not a GET request, respond with 405 Method Not Allowed
-        res.status(405).json({ message: 'Method Not Allowed' });
+        // If the request is not GET, respond with Method Not Allowed
+        return new Response(
+            JSON.stringify({ message: 'Method Not Allowed' }),
+            { status: 405, headers: response.headers }
+        );
     }
 }
