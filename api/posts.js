@@ -1,69 +1,55 @@
-// Import the MongoDB native driver
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
+import { connectToDatabase } from '../utils/db'; // Your connection utility
 
-// MongoDB URI and Database
-const MONGO_URI = process.env.MONGO_URI; // Make sure to set this in your environment variables
-const DB_NAME = 'chatApp'; // Replace with your database name
-let client;
+// Define the schema for the post
+const postSchema = new mongoose.Schema({
+    message: String,
+    timestamp: Date,
+    username: String,
+    sessionId: String,
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 },
+    likedBy: [String],  // Store usernames or user IDs of users who liked the post
+    dislikedBy: [String],  // Store usernames or user IDs of users who disliked the post
+    comments: [{ username: String, comment: String, timestamp: Date }]
+});
 
-async function connectToDatabase() {
-  if (!client) {
-    client = new MongoClient(MONGO_URI);
-    await client.connect();
-  }
-  const db = client.db(DB_NAME);
-  return db.collection('posts'); // Replace 'posts' with your collection name
-}
+// Create the model for posts
+const Post = mongoose.model('Post', postSchema);
 
 // Set CORS headers
-const setCorsHeaders = (response) => {
-  response.headers.set('Access-Control-Allow-Origin', '*'); // Allow all origins
-  response.headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS'); // Allowed methods
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type'); // Allowed headers
+const setCorsHeaders = (res) => {
+    // You can replace this with a specific origin URL if necessary
+    res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');  // Allow specific methods
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');  // Allow specific headers
 };
 
-// Serverless function handler
-export async function onRequest(context) {
-  const { request } = context;
-  const url = new URL(request.url);
+// Serverless API handler for getting posts
+export default async function handler(req, res) {
+    // Set CORS headers before processing the request
+    setCorsHeaders(res);
 
-  // Set CORS headers for every request
-  let response = new Response(null, {
-    headers: { 'Content-Type': 'application/json' },
-  });
-  setCorsHeaders(response);
-
-  // Handle pre-flight OPTIONS request (CORS pre-flight)
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: response.headers });
-  }
-
-  // Handle GET request to fetch posts
-  if (request.method === 'GET') {
-    try {
-      const postsCollection = await connectToDatabase(); // Connect to MongoDB
-      const posts = await postsCollection.find().sort({ timestamp: -1 }).toArray(); // Fetch posts
-
-      // Return the posts as a JSON response
-      response = new Response(JSON.stringify(posts), {
-        status: 200,
-        headers: response.headers,
-      });
-      return response;
-
-    } catch (error) {
-      console.error("Error retrieving posts:", error);
-      return new Response(
-        JSON.stringify({ message: 'Error retrieving posts', error }),
-        { status: 500, headers: response.headers }
-      );
+    // Handle pre-flight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end(); // Respond with a 200 OK for OPTIONS pre-flight
     }
-  } else {
-    // If the request is not GET, respond with Method Not Allowed
-    return new Response(
-      JSON.stringify({ message: 'Method Not Allowed' }),
-      { status: 405, headers: response.headers }
-    );
-  }
+
+    // Handle GET requests to fetch posts
+    if (req.method === 'GET') {
+        try {
+            await connectToDatabase(); // Connect to MongoDB
+
+            // Fetch posts from the database, sorted by the timestamp in descending order
+            const posts = await Post.find().sort({ timestamp: -1 });
+            res.status(200).json(posts); // Send posts as a JSON response
+        } catch (error) {
+            console.error("Error retrieving posts:", error);
+            res.status(500).json({ message: 'Error retrieving posts', error }); // Handle any errors
+        }
+    } else {
+        // If the request is not a GET request, respond with 405 Method Not Allowed
+        res.status(405).json({ message: 'Method Not Allowed' });
+    }
 }
 
